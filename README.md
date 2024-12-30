@@ -41,8 +41,8 @@ To safeguard against prompt injection attacks (malicious attempts to alter the c
    - Open the `API_KEYS.py` file in your project directory.
    - Add the following API keys:
      ```python
-     Gemeni_API = "<your-gemini-api-key>"
-     LAKERA_GUARD_API_KEY = "<your-lakera-guard-api-key>"
+     GEMINI_API_KEY
+     LAKERA_GUARD_API_KEY
      ```
 
 4. **Run the Application**:  
