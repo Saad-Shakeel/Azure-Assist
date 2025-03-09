@@ -26,7 +26,7 @@ def check_input_with_lakera_guard(user_question: str):
     
     # Step 2: Check if Lakera Guard flagged the content as inappropriate
     if guard_response.get("flagged"):
-        return "Warning: Attempting to access restricted or protected data without proper credentials is against our security policy. Please contact your system administrator if you require legitimate access to this information."
+        return "I'm sorry, but I can't provide that information. I can only respond to queries related to Microsoft Azure."
     
     # Step 3: If safe, pass the input to the chat model for response generation
     chat_session = st.session_state.chat_session
