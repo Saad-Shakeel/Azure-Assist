@@ -60,7 +60,7 @@ def media_btns():
         <a href="https://www.linkedin.com/in/saad-shakeel12" class="icon-button linkedin-button">
             <i class="fab fa-linkedin-in"></i>
         </a>
-        <a href="https://github.com" class="icon-button github-button">
+        <a href="https://github.com/Saad-Shakeel" class="icon-button github-button">
             <i class="fab fa-github"></i>
         </a>
         <a href="mailto:saadshakeel804@gmail.com" class="icon-button gmail-button">

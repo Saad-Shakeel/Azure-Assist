@@ -1,53 +1,58 @@
-# Azure Assist Chatbot
 
-## Overview
-Azure Assist Chatbot is an intelligent virtual assistant designed to handle queries specifically related to Microsoft Azure. Built using Python and the Streamlit platform, the chatbot leverages the **Gemini-1.5-Flash** model to deliver accurate and context-aware responses. 
+# Azure Assist 🌐
 
-The chatbot uses a **system prompt** to enforce a strict operational scope, ensuring it only responds to questions related to Microsoft Azure. If a user's query is unrelated to Azure, the chatbot politely declines to answer, maintaining focus on its domain of expertise. 
+Azure Assist is a Streamlit-powered chatbot designed to help users master Microsoft Azure. It leverages Google Gemini for conversational AI and integrates Lakera Guard for input safety, ensuring responses are focused exclusively on Azure topics.
 
-To safeguard against prompt injection attacks (malicious attempts to alter the chatbot’s behavior through user inputs), we integrate **Lakera Guard**, a robust security framework for language models.
+## Features
+- **Azure-Only Specialist**: Answers only Azure-related queries, with off-topic redirection.
+- **Gemini AI Integration**: Uses Google Gemini (via `google.generativeai`) for natural language responses.
+- **Lakera Guard Safety**: All user inputs are checked for safety before generating a response.
+- **Modern UI**: Custom media buttons for LinkedIn, GitHub, and Gmail contact.
+- **Session Management**: Start new chat sessions and maintain chat history.
 
----
-
-## Key Features
-
-1. **Gemini-1.5-Flash Model**:
-   - The chatbot is powered by the Gemini-1.5-Flash model, offering state-of-the-art language understanding and generation.
-   - Obtain the LLM API from [Google AI Studio](https://aistudio.google.com/apikey) and store it in the `API_KEYS.py` file under the variable name `Gemeni_API`.
-
-2. **Prompt Injection Protection**:
-   - To safeguard against prompt injection attacks that could alter the chatbot's behavior, the project integrates **Lakera Guard**.
-   - Acquire the Lakera Guard API key from [Lakera Guard's website](https://platform.lakera.ai/account/api-keys) and store it in the `API_KEYS.py` file under the variable name `LAKERA_GUARD_API_KEY`.
-
-3. **Streamlit Application**:
-   - Built on Streamlit, enabling an intuitive and interactive user interface for the chatbot.
-
----
-
-## Setup Instructions
+## Getting Started
 
 ### Prerequisites
+- Python 3.12+
+- [Streamlit](https://streamlit.io/)
+- Google Gemini API Key
+- Lakera Guard API Key
 
-- Python 3.8 or higher installed on your system.
-- Basic familiarity with Python and Streamlit.
-
-### Installation Steps
-
-1. **Install Dependencies**:  
-   Install the required Python packages using the `requirements.txt` file:
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Saad-Shakeel/Azure-Assist.git
+   cd Azure-Assist
+   ```
+2. Install dependencies:
+   ```bash
    pip install -r requirements.txt
-
-2. **Add API Keys**:  
-   - Open the `API_KEYS.py` file in your project directory.
-   - Add the following API keys:
-     ```python
-     GEMINI_API_KEY
-     LAKERA_GUARD_API_KEY
+   ```
+3. Add your API keys to Streamlit secrets:
+   - Create a `.streamlit/secrets.toml` file:
+     ```toml
+     GEMINI_API_KEY = "your-gemini-api-key"
+     LAKERA_GUARD_API_KEY = "your-lakera-guard-api-key"
      ```
 
-4. **Run the Application**:  
-   Start the Streamlit chatbot application by running:
-   ```
-   python -m streamlit run main.py
-   ```
+### Running the App
+```bash
+streamlit run main.py
+```
 
+## Usage
+- Enter your Azure-related questions in the chat input.
+- The bot will respond with concise, clear answers and may include links to official Azure documentation.
+- Off-topic questions are politely redirected.
+- Use the "Start New Chat" button to reset the session.
+
+## File Structure
+- `main.py` — Streamlit app entry point
+- `Lakera_Guard.py` — Lakera Guard API integration
+- `media_btns.py` — Custom social/contact buttons
+- `logo.png` — App icon
+- `requirements.txt` — Python dependencies
+
+
+## License
+MIT

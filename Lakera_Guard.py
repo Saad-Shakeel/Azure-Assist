@@ -3,6 +3,7 @@ import requests
 
 # Initialize Lakera Guard client
 LAKERA_GUARD_API_KEY = st.secrets["LAKERA_GUARD_API_KEY"]
+
 lakera_client = requests.Session()
 lakera_client.headers.update({
     'Authorization': f'Bearer {LAKERA_GUARD_API_KEY}'

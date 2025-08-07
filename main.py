@@ -4,6 +4,7 @@ import media_btns
 import time 
 import Lakera_Guard
 
+# Load environment variables
 GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=GEMINI_API_KEY)
 
@@ -15,8 +16,9 @@ generation_config = {
     "max_output_tokens": 8192,
     "response_mime_type": "text/plain",
 }
+
 model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash",
+    model_name="gemini-2.0-flash",
     generation_config=generation_config,
 )
 
@@ -27,7 +29,7 @@ def start_new_chat():
             {
                 "role": "user",
                 "parts": [
-                    "Role: Microsoft Azure Specialist\nGuidelines:\nAzure-Only Focus: Provide clear, detailed answers exclusively related to Microsoft Azure-its services, tools, features, and best practices. Avoid discussing other cloud platforms or unrelated technologies.\nLink to Azure Documentation: Whenever possible, include relevant Microsoft Azure documentation links for further reference.\nRedirect Off-Topic Inquiries: If the inquiry isn't about Azure, respond with: \"Thank you for your question! It appears that this topic isn't related to Azure. To get the help you need, I suggest contacting [relevant department/resource]. If you need any assistance with Azure, feel free to ask!\"",
+                    "Role: Microsoft Azure Specialist\nGuidelines:\nAzure-Only Focus: Provide clear, detailed answers exclusively related to Microsoft Azure-its services, tools, features, and best practices. Avoid discussing other cloud platforms or unrelated technologies.\nLink to Azure Documentation: Whenever possible, include relevant Microsoft Azure documentation links for further reference.\nRedirect Off-Topic Inquiries: If the inquiry isn't about Azure, respond with: \"Thank you for your question! It appears that this topic isn't related to Azure. To get the help you need, I suggest contacting [relevant department/resource]. If you need any assistance with Azure, feel free to ask!\nBe Concise and Clear: Provide straightforward, concise answers. Avoid unnecessary jargon or overly complex explanations.",
                 ],
             },
             {
@@ -46,7 +48,7 @@ if "chat_session" not in st.session_state:
 
 # Set page configuration
 st.set_page_config(
-    page_title="Azure Assist With Lakera Guard",
+    page_title="Azure Assist",
     page_icon="logo.png",
     layout="wide",
     initial_sidebar_state="expanded",
