@@ -1,52 +1,37 @@
-import streamlit as st 
-import google.generativeai as genai
+import streamlit as st
 import media_btns
-import time 
-import Lakera_Guard
-
-# Load environment variables
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from Lakera_Guard import check_input_with_lakera_guard  # Import function
+import time
+# -----------------------------
+# Load API Key
+# -----------------------------
 GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
-genai.configure(api_key=GEMINI_API_KEY)
 
-# Create the model
-generation_config = {
-    "temperature": 1,
-    "top_p": 0.95,
-    "top_k": 64,
-    "max_output_tokens": 8192,
-    "response_mime_type": "text/plain",
-}
-
-model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash",
-    generation_config=generation_config,
+# -----------------------------
+# Initialize LLM
+# -----------------------------
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.0-flash",
+    temperature=1,
+    google_api_key=GEMINI_API_KEY
 )
 
-# Function to start a new chat session
-def start_new_chat():
-    return model.start_chat(
-        history=[
-            {
-                "role": "user",
-                "parts": [
-                    "Role: Microsoft Azure Specialist\nGuidelines:\nAzure-Only Focus: Provide clear, detailed answers exclusively related to Microsoft Azure-its services, tools, features, and best practices. Avoid discussing other cloud platforms or unrelated technologies.\nLink to Azure Documentation: Whenever possible, include relevant Microsoft Azure documentation links for further reference.\nRedirect Off-Topic Inquiries: If the inquiry isn't about Azure, respond with: \"Thank you for your question! It appears that this topic isn't related to Azure. To get the help you need, I suggest contacting [relevant department/resource]. If you need any assistance with Azure, feel free to ask!\nBe Concise and Clear: Provide straightforward, concise answers. Avoid unnecessary jargon or overly complex explanations.",
-                ],
-            },
-            {
-                "role": "model",
-                "parts": [
-                    "Understood! I'm ready to assist you with your Microsoft Azure queries. Let's get started! What Azure questions can I help you with today?",
-                ],
-            },
-        ]
-    )
+# -----------------------------
+# System Prompt
+# -----------------------------
+system_prompt = """Role: Microsoft Azure Specialist
+Guidelines:
+- Azure-Only Focus: Provide clear, detailed answers exclusively related to Microsoft Azure—its services, tools, features, and best practices. Avoid discussing other cloud platforms or unrelated technologies.
+- Link to Azure Documentation: Whenever possible, always include relevant Microsoft Azure documentation links for further reference.
+- Redirect Off-Topic Inquiries: If the inquiry isn't about Azure, respond with:
+"Thank you for your question! It appears that this topic isn't related to Azure. To get the help you need, I suggest contacting [relevant department/resource]. If you need any assistance with Azure, feel free to ask!"
+- Be Concise and Clear: Provide straightforward, concise answers. Avoid unnecessary jargon or overly complex explanations."""
 
-
-# Initialize chat session
-if "chat_session" not in st.session_state:
-    st.session_state.chat_session = start_new_chat()
-
-# Set page configuration
+# -----------------------------
+# Page Config
+# -----------------------------
 st.set_page_config(
     page_title="Azure Assist",
     page_icon="logo.png",
@@ -54,57 +39,73 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Streamlit app title and caption
 st.title("Azure Assist 🌐")
 st.subheader("Welcome to AzureBot! 🚀 How can I assist you in mastering Microsoft Azure today?")
 st.caption("Developed by Saad Shakeel")
 media_btns.media_btns()
 
-# "Start New Chat" button
-if st.button("Start New Chat"):
-    st.session_state.messages = []  # Clear chat history
-    st.session_state.chat_session = start_new_chat()  # Start a new chat session
-    st.rerun()  # Refresh the app to reflect the changes
-
-# Initialize chat history in session state
+# -----------------------------
+# Session State
+# -----------------------------
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = [
+        SystemMessage(content=system_prompt),
+        AIMessage(content="Hello! 👋 I'm your Azure specialist. How can I help you explore Microsoft Azure today?")
+    ]
 
-# Display chat messages from history on app rerun
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+# -----------------------------
+# Session State
+# -----------------------------
+if "messages" not in st.session_state:
+    st.session_state.messages = [SystemMessage(content=system_prompt)]
 
-# Accept user input
+# -----------------------------
+# Start New Chat
+# -----------------------------
+if st.button("Start New Chat"):
+    st.session_state.messages = [SystemMessage(content=system_prompt)]
+    st.rerun()
+
+# -----------------------------
+# Display Chat History
+# -----------------------------
+for msg in st.session_state.messages:
+    if isinstance(msg, HumanMessage):
+        role = "user"
+    elif isinstance(msg, AIMessage):
+        role = "assistant"
+    else:
+        continue
+    with st.chat_message(role):
+        st.markdown(msg.content)
+
+# -----------------------------
+# Handle Input
+# -----------------------------
 if prompt := st.chat_input("Tell me your Azure needs, and I'll provide the answers! 📘"):
-    # Display user message in chat message container
+
+    # Show user input
     with st.chat_message("user"):
         st.markdown(prompt)
-    
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    st.session_state.messages.append(HumanMessage(content=prompt))
 
-    response_text = Lakera_Guard.check_input_with_lakera_guard(prompt)
+    # Lakera Guard check
+    lakera_result = check_input_with_lakera_guard(prompt)
+    if lakera_result["blocked"]:
+        with st.chat_message("assistant"):
+            st.markdown(lakera_result["message"])
+        st.session_state.messages.append(AIMessage(content=lakera_result["message"]))
+        st.stop()
 
-    def response_generator():
-        content = response_text.split()  # Split the response into words
-        generated_response = ""  # Initialize an empty string to build the response
-        for word in content:
-            generated_response += word + " " 
-            yield generated_response.strip()  # Yield the current full sentence so far
-            time.sleep(0.05)  # Adjust the speed of word generation here
-
-    # Display assistant response in chat message container
+    # Real-time streaming
     with st.chat_message("assistant"):
-        response_placeholder = st.empty()  # Create an empty placeholder to update text
-        final_response = ""  # Initialize an empty string for the final response
-        for sentence in response_generator():
-            final_response = sentence  # Update the final response
-            response_placeholder.markdown(final_response)
+        placeholder = st.empty()
+        full_response = ""
+        for chunk in llm.stream(st.session_state.messages):
+            full_response += chunk.content
+            placeholder.markdown(full_response + "▌")
+        placeholder.markdown(full_response)
 
-    time.sleep(0.1)
-    response_placeholder.markdown(response_text)  # Directly display the final response
-
-    # Add assistant response to chat history
-    st.session_state.messages.append({"role": "assistant", "content": response_text})
-    # print(prompt)
+    # Save response
+    st.session_state.messages.append(AIMessage(content=full_response))
     st.rerun()
